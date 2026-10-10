@@ -1,0 +1,32 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "MotoGrid MXGP 26 Series",
+  "version": "0.1.0",
+  "identifier": "com.motogrid.mxgp26series",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://127.0.0.1:5173",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [{
+      "title": "MotoGrid | MXGP 26 Series",
+      "width": 1440,
+      "height": 920,
+      "minWidth": 900,
+      "minHeight": 650,
+      "center": true,
+      "resizable": true
+    }],
+    "security": {
+      "csp": "default-src 'self'; connect-src ipc: http://ipc.localhost https://*.supabase.co wss://*.supabase.co; img-src 'self' asset: http://asset.localhost data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "shortDescription": "MotoGrid MXGP 26 Series standings and ranked desktop app",
+    "category": "Game"
+  }
+}
