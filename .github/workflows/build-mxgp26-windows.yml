@@ -3,16 +3,20 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - mxgp26-desktop-app
+      - main
     paths:
-      - 'mxgp26-desktop/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'index.html'
+      - 'src/**'
+      - 'supabase/**'
+      - 'src-tauri/**'
+      - '.env.example'
+      - 'README.md'
       - '.github/workflows/build-mxgp26-windows.yml'
 jobs:
   build-windows:
     runs-on: windows-latest
-    defaults:
-      run:
-        working-directory: mxgp26-desktop
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -28,6 +32,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: MotoGrid-MXGP26-Windows-Installer
-          path: mxgp26-desktop/src-tauri/target/release/bundle/nsis/*.exe
+          path: src-tauri/target/release/bundle/nsis/*.exe
           if-no-files-found: error
           retention-days: 30
