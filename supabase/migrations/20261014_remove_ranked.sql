@@ -1,5 +1,6 @@
 -- Remove Ranked rating data and retain championship standings only.
 -- Does not delete rider accounts, profiles, race events, or results.
+drop function if exists public.admin_publish_race(text,date,text,uuid[]);
 alter table public.profiles drop column if exists rating, drop column if exists ranked_races;
 alter table public.race_results drop column if exists rating_change;
 create or replace function public.create_profile_for_new_user()
