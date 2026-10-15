@@ -2,6 +2,9 @@
 -- Does not delete rider accounts, profiles, race events, or results.
 drop function if exists public.admin_publish_race(text,date,text,uuid[]);
 alter table public.profiles drop column if exists rating, drop column if exists ranked_races;
+alter table public.profiles add column if not exists platform text not null default 'Unassigned';
+alter table public.profiles drop constraint if exists profiles_platform_check;
+alter table public.profiles add constraint profiles_platform_check check (platform in ('Xbox','PS5','Unassigned'));
 alter table public.race_results drop column if exists rating_change;
 create or replace function public.create_profile_for_new_user()
 returns trigger language plpgsql security definer set search_path=''
@@ -17,9 +20,9 @@ $$;
 drop trigger if exists on_auth_user_created_motogrid on auth.users;
 create trigger on_auth_user_created_motogrid after insert on auth.users for each row execute function public.create_profile_for_new_user();
 revoke all on public.profiles from anon,authenticated;
-grant select(id,email,username,display_name,team_name,bio,role,championship_points,wins,races_entered,created_at) on public.profiles to authenticated;
-grant insert(id,email,username,display_name,team_name,bio) on public.profiles to authenticated;
-grant update(display_name,team_name,bio) on public.profiles to authenticated;
+grant select(id,email,username,display_name,team_name,bio,platform,role,championship_points,wins,races_entered,created_at) on public.profiles to authenticated;
+grant insert(id,email,username,display_name,team_name,bio,platform) on public.profiles to authenticated;
+grant update(display_name,team_name,bio,platform) on public.profiles to authenticated;
 
 create or replace function public.admin_publish_race(p_name text,p_race_date date,p_track text,p_finisher_ids uuid[])
 returns uuid language plpgsql security definer set search_path=public,pg_temp
