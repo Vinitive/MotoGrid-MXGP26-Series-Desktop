@@ -16,6 +16,11 @@ end;
 $$;
 drop trigger if exists on_auth_user_created_motogrid on auth.users;
 create trigger on_auth_user_created_motogrid after insert on auth.users for each row execute function public.create_profile_for_new_user();
+revoke all on public.profiles from anon,authenticated;
+grant select(id,email,username,display_name,team_name,bio,role,championship_points,wins,races_entered,created_at) on public.profiles to authenticated;
+grant insert(id,email,username,display_name,team_name,bio) on public.profiles to authenticated;
+grant update(display_name,team_name,bio) on public.profiles to authenticated;
+
 create or replace function public.admin_publish_race(p_name text,p_race_date date,p_track text,p_finisher_ids uuid[])
 returns uuid language plpgsql security definer set search_path=public,pg_temp
 as $$
