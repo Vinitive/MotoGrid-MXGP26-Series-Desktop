@@ -4,7 +4,7 @@ drop function if exists public.admin_publish_race(text,date,text,uuid[]);
 alter table public.profiles drop column if exists rating, drop column if exists ranked_races;
 alter table public.profiles add column if not exists platform text not null default 'Unassigned';
 alter table public.profiles drop constraint if exists profiles_platform_check;
-alter table public.profiles add constraint profiles_platform_check check (platform in ('Xbox','PS5','Unassigned'));
+alter table public.profiles add constraint profiles_platform_check check (platform in ('Xbox','PS5','PC','Unassigned'));
 alter table public.race_results drop column if exists rating_change;
 create or replace function public.create_profile_for_new_user()
 returns trigger language plpgsql security definer set search_path=''
