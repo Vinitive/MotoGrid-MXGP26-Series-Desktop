@@ -28,7 +28,18 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Build installer
-        run: npm run tauri -- build --bundles nsis
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+        shell: pwsh
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:VITE_SUPABASE_URL)) {
+            throw "Missing GitHub Actions secret VITE_SUPABASE_URL. Add it in Settings > Secrets and variables > Actions."
+          }
+          if ([string]::IsNullOrWhiteSpace($env:VITE_SUPABASE_PUBLISHABLE_KEY)) {
+            throw "Missing GitHub Actions secret VITE_SUPABASE_PUBLISHABLE_KEY. Add it in Settings > Secrets and variables > Actions."
+          }
+          npm run tauri -- build --bundles nsis
       - uses: actions/upload-artifact@v4
         with:
           name: MotoGrid-MXGP26-Windows-Installer
