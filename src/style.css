@@ -6,3 +6,48 @@
 
 /* Qualifying and race host additions */
 .host-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.host-card{border:1px solid var(--line);background:#101310;border-radius:7px;padding:20px;min-width:0}.host-card h3{font:700 22px 'Barlow Condensed',Impact,sans-serif;text-transform:uppercase;margin:0 0 18px}.host-detail{display:grid;grid-template-columns:70px minmax(0,1fr) auto;gap:10px;align-items:center;border-top:1px solid var(--line);padding:12px 0}.host-detail span{font-size:9px;letter-spacing:.12em;color:#8b958b;font-weight:800}.host-detail strong{font-size:11px;overflow-wrap:anywhere}.host-password{font-family:monospace;color:var(--lime)}.copy-password{padding:7px 9px;font-size:8px}.qualifying-finisher input{max-width:140px;padding:8px;font-size:11px}.qualifying-finisher strong{min-width:0}.platform-section .host-grid{margin-top:12px}@media(max-width:1100px){.host-grid{grid-template-columns:1fr}}
+
+
+/* Responsive layout for phone, tablet, and console browser viewports. */
+@media (max-width: 900px) {
+  body { min-width: 0; }
+  .shell { display: block; }
+  .sidebar { position: relative; top: auto; width: 100%; height: auto; padding: 16px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .sidebar .brand { padding: 0 4px 14px; }
+  .season { margin: 0 0 12px; }
+  .sidebar nav { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 5px; }
+  .nav-item { flex: 0 0 auto; white-space: nowrap; padding: 11px 12px; }
+  .nav-label { display: none; }
+  .sidebar-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; }
+  .profile-mini { border-top: 0; padding: 8px 0; }
+  .main { padding: 0 18px; }
+  .topbar { padding: 20px 0; gap: 14px; }
+  .topbar h1 { font-size: 28px; }
+  .content { padding-top: 20px; }
+  .hero-strip { grid-template-columns: 1fr; gap: 20px; }
+  .admin-grid, .form-grid, .rider-grid, .host-grid { grid-template-columns: 1fr; }
+  .form-grid .wide { grid-column: auto; }
+  .platform-section { margin-top: 24px; }
+  .table-wrap { max-width: 100%; overflow-x: auto; }
+  table { min-width: 520px; }
+  .schedule-card { grid-template-columns: auto auto minmax(0, 1fr); gap: 10px; }
+  .schedule-status { grid-column: 1 / -1; justify-self: start; }
+  .auth-screen { grid-template-columns: 1fr; }
+  .auth-art { min-height: 300px; padding: 26px; }
+  .auth-panel { padding: 30px 20px; }
+}
+@media (max-width: 520px) {
+  .main { padding: 0 12px; }
+  .topbar { align-items: flex-start; }
+  .topbar h1 { font-size: 23px; }
+  .season-pill { display: none; }
+  .hero-strip h2, .schedule-hero h2 { font-size: 38px; }
+  .section-head { align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  .section-head h2 { font-size: 22px; }
+  .schedule-card { grid-template-columns: 1fr; }
+  .schedule-status { grid-column: auto; }
+  footer { gap: 12px; flex-wrap: wrap; }
+  .admin-card { padding: 16px; }
+  .qualifying-finisher { flex-wrap: wrap; }
+  .qualifying-finisher input { flex: 1 1 100%; }
+}
