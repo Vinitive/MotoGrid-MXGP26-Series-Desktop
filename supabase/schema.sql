@@ -5,6 +5,7 @@ create table if not exists public.profiles (
  username text not null unique,
  display_name text not null default 'Rider' check(char_length(display_name) between 1 and 40),
  team_name text not null default '' check(char_length(team_name)<=60),
+ platform text not null default 'Unassigned' check(platform in ('Xbox','PS5','Unassigned')),
  bio text not null default '' check(char_length(bio)<=240),
  role text not null default 'rider' check(role in ('rider','admin')),
  championship_points integer not null default 0,
@@ -59,9 +60,9 @@ create policy "races visible to signed-in riders" on public.races for select to 
 drop policy if exists "results visible to signed-in riders" on public.race_results;
 create policy "results visible to signed-in riders" on public.race_results for select to authenticated using(true);
 revoke all on public.profiles from anon,authenticated;
-grant select(id,email,username,display_name,team_name,bio,role,championship_points,wins,races_entered,created_at) on public.profiles to authenticated;
-grant insert(id,email,username,display_name,team_name,bio) on public.profiles to authenticated;
-grant update(display_name,team_name,bio) on public.profiles to authenticated;
+grant select(id,email,username,display_name,team_name,bio,platform,role,championship_points,wins,races_entered,created_at) on public.profiles to authenticated;
+grant insert(id,email,username,display_name,team_name,bio,platform) on public.profiles to authenticated;
+grant update(display_name,team_name,bio,platform) on public.profiles to authenticated;
 revoke all on public.races from anon,authenticated;
 grant select on public.races to authenticated;
 revoke all on public.race_results from anon,authenticated;
