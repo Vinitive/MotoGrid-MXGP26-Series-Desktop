@@ -344,15 +344,21 @@ begin
 
  if v_group_id is null then
    select count(*)::integer into v_group_count from public.qualifying_groups where platform=v_platform;
-   if v_group_count<26 then
-     v_group_name := 'Group '||chr(65+v_group_count);
-   else
-     v_group_name := 'Group '||(v_group_count+1)::text;
-   end if;
+   v_group_count := v_group_count + 1;
+   loop
+     if v_group_count<=26 then
+       v_group_name := 'Group '||chr(64+v_group_count);
+     else
+       v_group_name := 'Group '||v_group_count::text;
+     end if;
+     exit when not exists(
+       select 1 from public.qualifying_groups g
+       where g.platform=v_platform and g.name=v_group_name
+     );
+     v_group_count := v_group_count + 1;
+   end loop;
    insert into public.qualifying_groups(platform,name) values(v_platform,v_group_name)
-   on conflict(platform,name) do nothing;
-   select g.id into v_group_id from public.qualifying_groups g
-   where g.platform=v_platform and g.name=v_group_name;
+   returning id into v_group_id;
  end if;
 
  insert into public.profiles(id,email,username,display_name,platform,qualifying_group_id)
