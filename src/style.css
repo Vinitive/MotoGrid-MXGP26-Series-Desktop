@@ -57,3 +57,10 @@
 .brand-logo img{display:block;width:100%;max-width:190px;height:76px;object-fit:contain;object-position:left center;}
 .brand-logo small{margin-top:0;}
 @media(max-width:900px){.brand-logo{flex-direction:row;align-items:center;gap:12px}.brand-logo img{width:145px;height:54px}.brand-logo small{display:block}}
+
+/* Platform and class filters */
+.filter-bar{display:flex;align-items:end;gap:14px;flex-wrap:wrap;margin:18px 0 22px;padding:16px;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.filter-field{display:grid;gap:8px;min-width:190px;flex:0 1 240px}
+.filter-field select{width:100%;min-height:42px;background:#101314;border:1px solid var(--line);border-radius:6px;padding:10px 12px;color:var(--text);font:600 13px Inter,sans-serif}
+.filter-field select:focus{outline:none;border-color:var(--lime)}
+@media(max-width:640px){.filter-bar{align-items:stretch;gap:12px}.filter-field{min-width:100%;flex:1 1 100%}}
