@@ -34,7 +34,28 @@ function table(headers,rows){return '<div class="table-wrap"><table><thead><tr>'
 function rowpos(i){return '<span class="position '+(!i?'first':'')+'">'+String(i+1).padStart(2,'0')+'</span>';}
 function riderCell(r){return '<div class="rider-cell"><div class="avatar">'+esc(ini(r.display_name))+'</div><strong>'+esc(r.display_name)+'</strong></div>';}
 function empty(title,desc){return '<div class="empty"><h3>'+title+'</h3><p class="muted">'+desc+'</p></div>';}
-function championship(){const a=[...s.riders].sort((x,y)=>(y.championship_points||0)-(x.championship_points||0)||(y.wins||0)-(x.wins||0));const standings=list=>list.length?table(['POS','RIDER','POINTS','WINS','RACES'],list.map((r,i)=>'<tr><td>'+rowpos(i)+'</td><td>'+riderCell(r)+'</td><td class="points">'+num(r.championship_points)+'</td><td>'+num(r.wins)+'</td><td>'+num(r.races_entered)+'</td></tr>').join('')):empty('No riders in this classification yet.','Riders appear here after they select this platform and results are published.');const platforms=[{key:'PC',title:'PC Championship'},{key:'Xbox',title:'Xbox Championship'},{key:'PS5',title:'PS5 Championship'}];return '<div class="hero-strip"><div><p class="eyebrow">THE SEASON RACE</p><h2>Every point<br>counts.</h2><p>Championship points are earned on race day and tracked across the season.</p></div><div class="hero-stat"><span>REGISTERED RIDERS</span><strong>'+String(a.length).padStart(2,'0')+'</strong><small>ON THE GRID</small></div></div><div class="section-head"><div><p class="eyebrow">OVERALL CLASSIFICATION</p><h2>Overall championship</h2></div><span class="subtle">POINTS · WINS · RACES</span></div>'+standings(a)+platforms.map(p=>{const list=a.filter(r=>r.platform===p.key);return '<section class="platform-section"><div class="section-head platform-head"><div><p class="eyebrow">'+p.key+' CLASSIFICATION</p><h2>'+p.title+'</h2></div><span class="subtle">'+list.length+' RIDERS</span></div>'+standings(list)+'</section>';}).join('')+'<p class="footnote">Overall standings include all riders. PC, Xbox, and PS5 tables rank riders within their selected platform. League championship points are entered by admins.</p>';}
+function championship(){
+ const platforms=[{key:'PC',title:'PC Championship'},{key:'Xbox',title:'Xbox Championship'},{key:'PS5',title:'PS5 Championship'}];
+ const tiers=[{name:'Premier',min:1,max:10,desc:'QUALIFYING POSITIONS 01–10'},{name:'Pro',min:11,max:20,desc:'QUALIFYING POSITIONS 11–20'},{name:'Amateur',min:21,max:30,desc:'QUALIFYING POSITIONS 21–30'}];
+ const qualifiedByPlatform={};
+ platforms.forEach(platform=>{
+  const records=s.qualifying.filter(q=>q.platform===platform.key).sort((a,b)=>(b.race_date||'').localeCompare(a.race_date||''));
+  if(!records.length){qualifiedByPlatform[platform.key]={round:null,riders:[]};return;}
+  const latest=records[0],roundRecords=records.filter(q=>q.platform===platform.key&&q.round_name===latest.round_name&&q.race_date===latest.race_date).sort((a,b)=>a.position-b.position);
+  qualifiedByPlatform[platform.key]={round:latest.round_name,date:latest.race_date,riders:roundRecords.map(q=>({...q,rider:s.riders.find(r=>r.id===q.rider_id)})).filter(q=>q.rider)};
+ });
+ const qualifiedCount=Object.values(qualifiedByPlatform).reduce((n,p)=>n+p.riders.length,0);
+ const tableRows=list=>list.length?table(['POS','RIDER','POINTS','WINS','RACES'],list.map(q=>{const r=q.rider;return '<tr><td>'+rowpos(q.position-1)+'</td><td>'+riderCell(r)+'</td><td class="points">'+num(r.championship_points)+'</td><td>'+num(r.wins)+'</td><td>'+num(r.races_entered)+'</td></tr>';}).join('')):empty('No qualified riders yet.','Riders appear here after qualifying results are published for this platform.');
+ const sections=platforms.map(platform=>{
+  const data=qualifiedByPlatform[platform.key],latestLabel=data.round?esc(data.round)+' · '+esc(data.date):'AWAITING QUALIFYING';
+  const tierSections=tiers.map(tier=>{
+   const riders=data.riders.filter(q=>q.position>=tier.min&&q.position<=tier.max);
+   return '<section class="platform-section tier-section"><div class="section-head platform-head"><div><p class="eyebrow">'+tier.desc+'</p><h3>'+tier.name+'</h3></div><span class="subtle">'+riders.length+'/10 RIDERS</span></div>'+tableRows(riders)+'</section>';
+  }).join('');
+  return '<section class="platform-section"><div class="section-head platform-head"><div><p class="eyebrow">'+platform.key+' CLASSIFICATION</p><h2>'+platform.title+'</h2><p class="muted">'+(data.round?'Tier assignments from '+latestLabel:'No qualifying session has been published for this platform yet.')+'</p></div><span class="subtle">'+data.riders.length+' QUALIFIED</span></div>'+tierSections+'</section>';
+ }).join('');
+ return '<div class="hero-strip"><div><p class="eyebrow">THE SEASON RACE</p><h2>Earn your<br>classification.</h2><p>Each platform has separate Premier, Pro, and Amateur championships. Riders are listed only after qualifying results are published.</p></div><div class="hero-stat"><span>QUALIFIED RIDERS</span><strong>'+String(qualifiedCount).padStart(2,'0')+'</strong><small>ACROSS ALL PLATFORMS</small></div></div><div class="section-head"><div><p class="eyebrow">PLATFORM CLASSIFICATIONS</p><h2>Championship standings</h2></div><span class="subtle">PREMIER · PRO · AMATEUR</span></div>'+sections+'<p class="footnote">Premier uses qualifying positions 1–10, Pro uses positions 11–20, and Amateur uses positions 21–30 for each platform. Standings within each tier use championship points, wins, and races; riders remain hidden until that platform has published qualifying results.</p>';
+}
 function schedule(){
 const rounds=ROUNDS;
 const titleFor=r=>{const n=r.name.replace(/^YPF /,'').replace(/^Liqui Moly /,'').replace(/^Monster Energy /,'').replace(/^The Oriental Beauty Valley /,'').replace(/ presented by iXS/,'').replace(/ presented by Sitzler/,'');return n+' — '+(r.venue||'').split(',')[0];};
