@@ -45,7 +45,7 @@ function championship(){
   qualifiedByPlatform[platform.key]={round:latest.round_name,date:latest.race_date,riders:roundRecords.map(q=>({...q,rider:s.riders.find(r=>r.id===q.rider_id)})).filter(q=>q.rider)};
  });
  const qualifiedCount=Object.values(qualifiedByPlatform).reduce((n,p)=>n+p.riders.length,0);
- const tableRows=list=>list.length?table(['POS','RIDER','POINTS','WINS','RACES'],list.map(q=>{const r=q.rider;return '<tr><td>'+rowpos(q.position-1)+'</td><td>'+riderCell(r)+'</td><td class="points">'+num(r.championship_points)+'</td><td>'+num(r.wins)+'</td><td>'+num(r.races_entered)+'</td></tr>';}).join('')):empty('No qualified riders yet.','Riders appear here after qualifying results are published for this platform.');
+ const tableRows=list=>{const standings=[...list].sort((a,b)=>(b.rider.championship_points||0)-(a.rider.championship_points||0)||(b.rider.wins||0)-(a.rider.wins||0)||(b.rider.races_entered||0)-(a.rider.races_entered||0)||a.position-b.position);return standings.length?table(['POS','RIDER','QUAL POS','POINTS','WINS','RACES'],standings.map((q,i)=>{const r=q.rider;return '<tr><td>'+rowpos(i)+'</td><td>'+riderCell(r)+'</td><td>'+String(q.position).padStart(2,'0')+'</td><td class="points">'+num(r.championship_points)+'</td><td>'+num(r.wins)+'</td><td>'+num(r.races_entered)+'</td></tr>';}).join('')):empty('No qualified riders yet.','Riders appear here after qualifying results are published for this platform.');};
  const sections=platforms.map(platform=>{
   const data=qualifiedByPlatform[platform.key],latestLabel=data.round?esc(data.round)+' · '+esc(data.date):'AWAITING QUALIFYING';
   const tierSections=tiers.map(tier=>{
