@@ -282,3 +282,32 @@ end;
 $$;
 revoke all on function public.admin_save_race_host(text,date,text,uuid,text,text,text) from public,anon;
 grant execute on function public.admin_save_race_host(text,date,text,uuid,text,text,text) to authenticated;
+
+-- Admin-only deletion controls for race hosts and qualifying groups.
+create or replace function public.admin_delete_race_host(p_host_id uuid)
+returns void language plpgsql security definer set search_path=public,pg_temp
+as $$
+begin
+ if not exists(select 1 from public.profiles where id=auth.uid() and role='admin') then
+   raise exception 'Only league administrators can remove race hosts.' using errcode='42501';
+ end if;
+ delete from public.race_hosts where id=p_host_id;
+ if not found then raise exception 'Race host not found.'; end if;
+end;
+$$;
+revoke all on function public.admin_delete_race_host(uuid) from public,anon;
+grant execute on function public.admin_delete_race_host(uuid) to authenticated;
+
+create or replace function public.admin_delete_qualifying_group(p_group_id uuid)
+returns void language plpgsql security definer set search_path=public,pg_temp
+as $$
+begin
+ if not exists(select 1 from public.profiles where id=auth.uid() and role='admin') then
+   raise exception 'Only league administrators can remove qualifying groups.' using errcode='42501';
+ end if;
+ delete from public.qualifying_groups where id=p_group_id;
+ if not found then raise exception 'Qualifying group not found.'; end if;
+end;
+$$;
+revoke all on function public.admin_delete_qualifying_group(uuid) from public,anon;
+grant execute on function public.admin_delete_qualifying_group(uuid) to authenticated;
