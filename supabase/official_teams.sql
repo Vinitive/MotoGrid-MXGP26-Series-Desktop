@@ -59,3 +59,47 @@ revoke all on function public.admin_create_official_team(text) from public, anon
 grant execute on function public.admin_create_official_team(text) to authenticated;
 revoke all on function public.admin_delete_official_team(uuid) from public, anon;
 grant execute on function public.admin_delete_official_team(uuid) to authenticated;
+
+-- Only administrators may change a rider's team, including through direct API requests.
+create or replace function public.prevent_non_admin_team_changes()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+ if new.team_name is distinct from old.team_name
+    and not exists (select 1 from public.profiles where id = auth.uid() and role = 'admin') then
+  raise exception 'Only league administrators can assign or change official teams.' using errcode = '42501';
+ end if;
+ return new;
+end;
+$$;
+
+drop trigger if exists profiles_admin_only_team_assignment on public.profiles;
+create trigger profiles_admin_only_team_assignment
+ before update of team_name on public.profiles
+ for each row execute function public.prevent_non_admin_team_changes();
+
+create or replace function public.admin_assign_official_team(p_rider_id uuid, p_team_name text)
+returns void
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare v_name text := trim(coalesce(p_team_name, ''));
+begin
+ if not exists (select 1 from public.profiles where id = auth.uid() and role = 'admin') then
+  raise exception 'Only league administrators can assign official teams.' using errcode = '42501';
+ end if;
+ if not exists (select 1 from public.profiles where id = p_rider_id) then
+  raise exception 'Rider not found.';
+ end if;
+ if v_name <> '' and not exists (select 1 from public.official_teams where name = v_name) then
+  raise exception 'Choose a team from the official teams list.';
+ end if;
+ update public.profiles set team_name = v_name where id = p_rider_id;
+end;
+$$;
+revoke all on function public.admin_assign_official_team(uuid, text) from public, anon;
+grant execute on function public.admin_assign_official_team(uuid, text) to authenticated;
