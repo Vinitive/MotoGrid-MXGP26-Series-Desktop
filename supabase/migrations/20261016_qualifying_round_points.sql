@@ -3,6 +3,9 @@
 alter table public.qualifying_results
   add column if not exists points integer not null default 0 check (points >= 0);
 
+-- Backfill points for any qualifying results already published before this migration.
+update public.qualifying_results set points=greatest(11-position,0);
+
 create or replace function public.admin_publish_qualifying(
   p_round_name text,
   p_race_date date,
